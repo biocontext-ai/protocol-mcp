@@ -1,7 +1,7 @@
 {
 	"name": "protocol-mcp",
 	"description": "MCP server that connects to wetlab protocol resources, including protocols.io",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"repository": "https://github.com/biocontext-ai/protocol-mcp",
 	"tools": [
 		{
