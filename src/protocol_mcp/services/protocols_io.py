@@ -121,21 +121,12 @@ async def search_protocols(
     ProtocolSearchResponse
         Search results with pagination info.
     """
-    filter_params = {}
-    if peer_reviewed_only:
-        filter_params["filter"] = "peer_reviewed"
-    else:
-        # Default to searching public protocols
-        filter_params["filter"] = "public"
-
-    # Use date ordering instead of relevance (which has a DB error)
-    filter_params["order_field"] = "date"
-    filter_params["order_dir"] = "desc"
+    filter_type = "peer_reviewed" if peer_reviewed_only else "public"
 
     response = await client.search_protocols(
         query=query,
         page_size=max_results,
-        filter_params=filter_params,
+        filter_type=filter_type,
     )
 
     items = [_parse_search_item(item) for item in response.get("items", [])]

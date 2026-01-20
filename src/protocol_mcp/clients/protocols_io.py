@@ -83,7 +83,9 @@ class ProtocolsIOClient:
         query: str,
         page_size: int = 10,
         page_id: int = 1,
-        filter_params: dict[str, Any] | None = None,
+        filter_type: str = "public",
+        order_field: str = "date",
+        order_dir: str = "desc",
     ) -> dict[str, Any]:
         """Search for protocols using v3 API.
 
@@ -92,11 +94,17 @@ class ProtocolsIOClient:
         query : str
             Search query string.
         page_size : int
-            Number of results per page.
+            Number of results per page (1-100).
         page_id : int
             Page number (1-indexed).
-        filter_params : dict[str, Any] | None
-            Additional filter parameters.
+        filter_type : str
+            Protocol filter type. One of: 'public', 'user_public',
+            'user_private', 'shared_with_user'. Defaults to 'public'.
+        order_field : str
+            Sort field: 'activity', 'date', 'name', or 'id'.
+            Defaults to 'date'.
+        order_dir : str
+            Sort direction: 'asc' or 'desc'. Defaults to 'desc'.
 
         Returns
         -------
@@ -105,13 +113,13 @@ class ProtocolsIOClient:
         """
         url = f"{self.config.base_url_v3}/protocols"
         params = {
+            "filter": filter_type,
             "key": query,
             "page_size": page_size,
             "page_id": page_id,
-            "order_field": "relevance",
+            "order_field": order_field,
+            "order_dir": order_dir,
         }
-        if filter_params:
-            params.update(filter_params)
         return await self._request("GET", url, params=params)
 
     async def get_protocol(
