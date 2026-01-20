@@ -20,7 +20,6 @@ from protocol_mcp.services.protocols_io import (
 async def search_protocols(
     query: Annotated[str, "Search term (e.g., 'RNA extraction', 'CRISPR knockout')"],
     max_results: Annotated[int, "Number of results to return (1-50)"] = 10,
-    peer_reviewed_only: Annotated[bool, "Filter to peer-reviewed protocols only"] = False,
 ) -> str:
     """Search protocols.io for laboratory protocols.
 
@@ -30,8 +29,6 @@ async def search_protocols(
         Search term to find protocols.
     max_results : int
         Number of results (1-50), defaults to 10.
-    peer_reviewed_only : bool
-        If True, only return peer-reviewed protocols.
 
     Returns
     -------
@@ -45,7 +42,6 @@ async def search_protocols(
             client=client,
             query=query,
             max_results=max_results,
-            peer_reviewed_only=peer_reviewed_only,
         )
 
     return format_search_results(response)

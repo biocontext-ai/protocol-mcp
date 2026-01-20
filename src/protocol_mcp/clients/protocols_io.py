@@ -30,12 +30,12 @@ class ProtocolsIOClient:
         Returns
         -------
         dict[str, str]
-            Headers dict with Authorization if token is configured.
+            Headers dict with Authorization.
         """
-        headers = {"Accept": "application/json"}
-        if self.config.access_token:
-            headers["Authorization"] = f"Bearer {self.config.access_token.get_secret_value()}"
-        return headers
+        return {
+            "Accept": "application/json",
+            "Authorization": f"Bearer {self.config.access_token.get_secret_value()}",
+        }
 
     async def __aenter__(self) -> "ProtocolsIOClient":
         """Enter async context manager."""

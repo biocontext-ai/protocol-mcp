@@ -11,7 +11,7 @@ class ProtocolsIOConfig(BaseModel):
 
     base_url_v3: str = "https://www.protocols.io/api/v3"
     base_url_v4: str = "https://www.protocols.io/api/v4"
-    access_token: SecretStr | None = None
+    access_token: SecretStr
 
 
 class Settings(BaseModel):
@@ -28,11 +28,21 @@ def get_settings() -> Settings:
     -------
     Settings
         Application settings loaded from environment.
+
+    Raises
+    ------
+    ValueError
+        If PROTOCOLS_IO_ACCESS_TOKEN is not set.
     """
     access_token = os.environ.get("PROTOCOLS_IO_ACCESS_TOKEN")
+    if not access_token:
+        raise ValueError(
+            "PROTOCOLS_IO_ACCESS_TOKEN environment variable is required. "
+            "Get your token from https://www.protocols.io/developers"
+        )
 
     return Settings(
         protocols_io=ProtocolsIOConfig(
-            access_token=SecretStr(access_token) if access_token else None,
+            access_token=SecretStr(access_token),
         )
     )

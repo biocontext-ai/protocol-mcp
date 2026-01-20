@@ -1,5 +1,6 @@
 """Business logic for protocols.io operations."""
 
+import json
 import re
 from typing import Any
 
@@ -13,6 +14,43 @@ from protocol_mcp.models.protocols_io import (
     ProtocolStep,
     UserObject,
 )
+
+
+def _parse_draftjs_content(content: str | dict | None) -> str:
+    """Parse Draft.js JSON content to plain text.
+
+    The protocols.io API returns rich text fields as Draft.js JSON.
+    This function extracts the plain text from those blocks.
+
+    Parameters
+    ----------
+    content : str | dict | None
+        Raw content, either as JSON string or parsed dict.
+
+    Returns
+    -------
+    str
+        Plain text extracted from Draft.js blocks.
+    """
+    if not content:
+        return ""
+
+    if isinstance(content, str):
+        # Check if it's JSON
+        if content.startswith("{") or content.startswith("["):
+            try:
+                content = json.loads(content)
+            except json.JSONDecodeError:
+                return content
+        else:
+            return content
+
+    if isinstance(content, dict):
+        blocks = content.get("blocks", [])
+        if blocks:
+            return "\n\n".join(block.get("text", "") for block in blocks if block.get("text"))
+
+    return str(content) if content else ""
 
 
 def _parse_search_item(item: dict[str, Any]) -> ProtocolSearchItem:
@@ -52,6 +90,8 @@ def _parse_search_item(item: dict[str, Any]) -> ProtocolSearchItem:
 def _parse_step(step: dict[str, Any]) -> ProtocolStep:
     """Parse a single protocol step.
 
+    Handles both v3 and v4 API response formats.
+
     Parameters
     ----------
     step : dict[str, Any]
@@ -62,11 +102,15 @@ def _parse_step(step: dict[str, Any]) -> ProtocolStep:
     ProtocolStep
         Parsed step.
     """
+    # v4 API uses 'number' and 'step' (content), v3 uses 'step_number' and 'description'
+    step_number = step.get("number") or step.get("step_number")
+    description = _parse_draftjs_content(step.get("step") or step.get("description"))
+
     return ProtocolStep(
         id=step.get("id", 0),
-        step_number=step.get("step_number"),
+        step_number=step_number,
         title=step.get("title"),
-        description=step.get("description"),
+        description=description,
         section=step.get("section"),
         duration=step.get("duration"),
         duration_unit=step.get("duration_unit"),
@@ -101,7 +145,6 @@ async def search_protocols(
     client: ProtocolsIOClient,
     query: str,
     max_results: int = 10,
-    peer_reviewed_only: bool = False,
 ) -> ProtocolSearchResponse:
     """Search for protocols.
 
@@ -113,20 +156,15 @@ async def search_protocols(
         Search query string.
     max_results : int
         Maximum number of results to return.
-    peer_reviewed_only : bool
-        Filter to peer-reviewed protocols only.
 
     Returns
     -------
     ProtocolSearchResponse
         Search results with pagination info.
     """
-    filter_type = "peer_reviewed" if peer_reviewed_only else "public"
-
     response = await client.search_protocols(
         query=query,
         page_size=max_results,
-        filter_type=filter_type,
     )
 
     items = [_parse_search_item(item) for item in response.get("items", [])]
@@ -199,7 +237,8 @@ async def get_protocol_detail(
     normalized_id = _normalize_protocol_id(protocol_id)
     response = await client.get_protocol(normalized_id)
 
-    protocol = response.get("protocol", response)
+    # v4 API returns data in 'payload', v3 uses 'protocol'
+    protocol = response.get("payload") or response.get("protocol") or response
 
     creator = None
     if protocol.get("creator"):
@@ -213,10 +252,10 @@ async def get_protocol_detail(
         title=protocol.get("title", ""),
         uri=protocol.get("uri", ""),
         doi=protocol.get("doi"),
-        description=protocol.get("description"),
-        before_start=protocol.get("before_start"),
-        warning=protocol.get("warning"),
-        guidelines=protocol.get("guidelines"),
+        description=_parse_draftjs_content(protocol.get("description")),
+        before_start=_parse_draftjs_content(protocol.get("before_start")),
+        warning=_parse_draftjs_content(protocol.get("warning")),
+        guidelines=_parse_draftjs_content(protocol.get("guidelines")),
         steps=[],
         materials=[],
         creator=creator,
@@ -244,7 +283,15 @@ async def get_protocol_steps(
     """
     normalized_id = _normalize_protocol_id(protocol_id)
     response = await client.get_protocol_steps(normalized_id)
-    steps_data = response.get("steps", response.get("items", []))
+
+    # v4 API returns steps directly in 'payload' as a list
+    # v3 API returns them in 'steps' or 'items'
+    payload = response.get("payload")
+    if isinstance(payload, list):
+        steps_data = payload
+    else:
+        steps_data = response.get("steps", response.get("items", []))
+
     return [_parse_step(step) for step in steps_data]
 
 
@@ -268,7 +315,15 @@ async def get_protocol_materials(
     """
     normalized_id = _normalize_protocol_id(protocol_id)
     response = await client.get_protocol_materials(normalized_id)
-    materials_data = response.get("materials", response.get("items", []))
+
+    # v4 API returns full protocol in 'payload', materials are in payload.materials
+    # v3 API returns them in 'materials' or 'items'
+    payload = response.get("payload")
+    if isinstance(payload, dict):
+        materials_data = payload.get("materials", [])
+    else:
+        materials_data = response.get("materials", response.get("items", []))
+
     return [_parse_material(mat) for mat in materials_data]
 
 
