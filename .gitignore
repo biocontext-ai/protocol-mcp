@@ -15,6 +15,7 @@ __pycache__/
 /data/
 /node_modules/
 coverage.xml
+.coverage
 
 # docs
 /docs/generated/
@@ -23,3 +24,4 @@ coverage.xml
 # env files
 .env
 *.local
+.vscode

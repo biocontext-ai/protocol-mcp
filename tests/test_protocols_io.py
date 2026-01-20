@@ -19,7 +19,7 @@ import protocol_mcp
 async def test_search_protocols_returns_formatted_results(httpx_mock: HTTPXMock):
     """Test that search returns properly formatted results."""
     httpx_mock.add_response(
-        url="https://www.protocols.io/api/v3/protocols?key=RNA&page_size=10&page_id=1&order_field=relevance",
+        url="https://www.protocols.io/api/v3/protocols?key=RNA&page_size=10&page_id=1&filter=public&order_field=date&order_dir=desc",
         json=SEARCH_RESPONSE,
     )
 
@@ -39,7 +39,7 @@ async def test_search_protocols_returns_formatted_results(httpx_mock: HTTPXMock)
 async def test_search_protocols_handles_empty_results(httpx_mock: HTTPXMock):
     """Test that search handles no results gracefully."""
     httpx_mock.add_response(
-        url="https://www.protocols.io/api/v3/protocols?key=nonexistent_xyz_query&page_size=10&page_id=1&order_field=relevance",
+        url="https://www.protocols.io/api/v3/protocols?key=nonexistent_xyz_query&page_size=10&page_id=1&filter=public&order_field=date&order_dir=desc",
         json=EMPTY_SEARCH_RESPONSE,
     )
 
@@ -53,7 +53,7 @@ async def test_search_protocols_handles_empty_results(httpx_mock: HTTPXMock):
 async def test_search_protocols_with_peer_reviewed_filter(httpx_mock: HTTPXMock):
     """Test that peer_reviewed_only filter is applied."""
     httpx_mock.add_response(
-        url="https://www.protocols.io/api/v3/protocols?key=RNA&page_size=10&page_id=1&order_field=relevance&filter=peer_reviewed",
+        url="https://www.protocols.io/api/v3/protocols?key=RNA&page_size=10&page_id=1&filter=peer_reviewed&order_field=date&order_dir=desc",
         json=SEARCH_RESPONSE,
     )
 
@@ -190,7 +190,7 @@ async def test_search_respects_max_results_bounds(httpx_mock: HTTPXMock):
     """Test that max_results is bounded between 1 and 50."""
     # Test with value > 50 (should be clamped to 50)
     httpx_mock.add_response(
-        url="https://www.protocols.io/api/v3/protocols?key=RNA&page_size=50&page_id=1&order_field=relevance",
+        url="https://www.protocols.io/api/v3/protocols?key=RNA&page_size=50&page_id=1&filter=public&order_field=date&order_dir=desc",
         json=SEARCH_RESPONSE,
     )
 

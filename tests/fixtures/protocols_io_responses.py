@@ -1,34 +1,63 @@
 """Mock responses for protocols.io API tests."""
 
 SEARCH_RESPONSE = {
+    "status_code": 0,
     "items": [
         {
             "id": 12345,
             "title": "RNA Extraction from Tissue Samples",
+            "title_html": "RNA Extraction from Tissue Samples",
             "uri": "rna-extraction-from-tissue-samples-abc123",
-            "doi": "10.17504/protocols.io.abc123",
+            "doi": "dx.doi.org/10.17504/protocols.io.abc123",
+            "url": "https://www.protocols.io/view/rna-extraction-from-tissue-samples-abc123",
             "stats": {
                 "number_of_steps": 15,
+                "number_of_views": 1234,
+                "number_of_bookmarks": 5,
+                "number_of_comments": 2,
             },
             "creator": {
                 "name": "Jane Doe",
                 "username": "janedoe",
+                "affiliation": "Test University",
+                "link": None,
+                "image": {
+                    "source": "https://www.protocols.io/img/avatars/001.png",
+                    "placeholder": "https://www.protocols.io/img/avatars/001.png",
+                },
             },
             "version_id": 1,
+            "public": True,
+            "published_on": 1609459200,
+            "created_on": 1609459200,
         },
         {
             "id": 12346,
             "title": "High-Quality RNA Isolation Protocol",
+            "title_html": "High-Quality RNA Isolation Protocol",
             "uri": "high-quality-rna-isolation-xyz789",
-            "doi": "10.17504/protocols.io.xyz789",
+            "doi": "dx.doi.org/10.17504/protocols.io.xyz789",
+            "url": "https://www.protocols.io/view/high-quality-rna-isolation-xyz789",
             "stats": {
                 "number_of_steps": 22,
+                "number_of_views": 567,
+                "number_of_bookmarks": 3,
+                "number_of_comments": 1,
             },
             "creator": {
                 "name": "John Smith",
                 "username": "johnsmith",
+                "affiliation": "Research Institute",
+                "link": None,
+                "image": {
+                    "source": "https://www.protocols.io/img/avatars/002.png",
+                    "placeholder": "https://www.protocols.io/img/avatars/002.png",
+                },
             },
             "version_id": 2,
+            "public": True,
+            "published_on": 1609545600,
+            "created_on": 1609545600,
         },
     ],
     "pagination": {
@@ -36,16 +65,27 @@ SEARCH_RESPONSE = {
         "total_pages": 5,
         "total_results": 47,
         "page_size": 10,
+        "next_page": "https://www.protocols.io/api/v3/protocols?filter=public&key=RNA&page_id=2&page_size=10",
+        "prev_page": None,
+        "first": 0,
+        "last": 47,
+        "changed_on": None,
     },
 }
 
 EMPTY_SEARCH_RESPONSE = {
+    "status_code": 0,
     "items": [],
     "pagination": {
         "current_page": 1,
         "total_pages": 0,
         "total_results": 0,
         "page_size": 10,
+        "next_page": None,
+        "prev_page": None,
+        "first": 0,
+        "last": 0,
+        "changed_on": None,
     },
 }
 

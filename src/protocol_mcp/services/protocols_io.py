@@ -124,6 +124,13 @@ async def search_protocols(
     filter_params = {}
     if peer_reviewed_only:
         filter_params["filter"] = "peer_reviewed"
+    else:
+        # Default to searching public protocols
+        filter_params["filter"] = "public"
+
+    # Use date ordering instead of relevance (which has a DB error)
+    filter_params["order_field"] = "date"
+    filter_params["order_dir"] = "desc"
 
     response = await client.search_protocols(
         query=query,
