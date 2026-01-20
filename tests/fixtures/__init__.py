@@ -1,0 +1,17 @@
+"""Test fixtures for protocol-mcp tests."""
+
+from .protocols_io_responses import (
+    EMPTY_SEARCH_RESPONSE,
+    PROTOCOL_DETAIL_RESPONSE,
+    PROTOCOL_MATERIALS_RESPONSE,
+    PROTOCOL_STEPS_RESPONSE,
+    SEARCH_RESPONSE,
+)
+
+__all__ = [
+    "EMPTY_SEARCH_RESPONSE",
+    "PROTOCOL_DETAIL_RESPONSE",
+    "PROTOCOL_MATERIALS_RESPONSE",
+    "PROTOCOL_STEPS_RESPONSE",
+    "SEARCH_RESPONSE",
+]

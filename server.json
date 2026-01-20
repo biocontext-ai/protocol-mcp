@@ -1,0 +1,77 @@
+{
+	"name": "protocol-mcp",
+	"description": "MCP server that connects to wetlab protocol resources, including protocols.io",
+	"version": "0.0.1",
+	"repository": "https://github.com/biocontext-ai/protocol-mcp",
+	"tools": [
+		{
+			"name": "search_protocols",
+			"description": "Search protocols.io for laboratory protocols by query string",
+			"arguments": [
+				{
+					"name": "query",
+					"type": "string",
+					"description": "Search term (e.g., 'RNA extraction', 'CRISPR knockout')",
+					"required": true
+				},
+				{
+					"name": "max_results",
+					"type": "integer",
+					"description": "Number of results to return (1-50)",
+					"required": false,
+					"default": 10
+				},
+				{
+					"name": "peer_reviewed_only",
+					"type": "boolean",
+					"description": "Filter to peer-reviewed protocols only",
+					"required": false,
+					"default": false
+				}
+			]
+		},
+		{
+			"name": "get_protocol",
+			"description": "Retrieve full protocol details from protocols.io by identifier",
+			"arguments": [
+				{
+					"name": "protocol_id",
+					"type": "string",
+					"description": "Protocol identifier: URI, DOI, or numeric ID from search results",
+					"required": true
+				},
+				{
+					"name": "include_steps",
+					"type": "boolean",
+					"description": "Include step-by-step instructions",
+					"required": false,
+					"default": true
+				},
+				{
+					"name": "include_materials",
+					"type": "boolean",
+					"description": "Include materials/reagents list",
+					"required": false,
+					"default": true
+				}
+			]
+		}
+	],
+	"configuration": {
+		"env": [
+			{
+				"name": "PROTOCOLS_IO_ACCESS_TOKEN",
+				"description": "protocols.io API access token (optional for public protocols, required for private)",
+				"required": false
+			}
+		]
+	},
+	"installation": {
+		"uv": "uvx protocol-mcp",
+		"pip": "pip install protocol-mcp"
+	},
+	"run": {
+		"command": "protocol_mcp",
+		"transport": "stdio"
+	}
+}
