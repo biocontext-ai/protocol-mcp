@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
   "click",
-  "fastmcp",
+  "fastmcp<3",
   "httpx>=0.25",
   "pydantic>=2",
 ]
